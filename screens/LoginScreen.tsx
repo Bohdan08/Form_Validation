@@ -127,14 +127,6 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingHorizontal: 12,
   },
-  formTextInput: {
-    border: "1px solid grey",
-    borderRadius: 1,
-    marginTop: 10,
-    marginBottom: 10,
-    height: 35,
-    padding: 5,
-  },
   title: {
     fontSize: 24,
     fontWeight: "600",

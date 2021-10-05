@@ -1,6 +1,7 @@
 import React from "react";
 import { Pressable, StyleSheet } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
+import { Text } from "./Themed";
 
 type IconButtonType = {
   color: string;
@@ -23,9 +24,10 @@ type IconButtonType = {
     | "logout"
     | "rightcircle";
   onPress: () => any;
+  text: string;
 };
 
-const IconButton = ({ color, size, onPress, name }: IconButtonType) => (
+const IconButton = ({ color, size, onPress, name, text }: IconButtonType) => (
   <Pressable
     style={(args) => {
       if (args.pressed) {
@@ -34,11 +36,23 @@ const IconButton = ({ color, size, onPress, name }: IconButtonType) => (
           {
             opacity: 0.5,
             backgroundColor: "blue",
+            width: 150,
+            padding: 10,
+            borderRadius: 5,
           },
         ];
       }
 
-      return [styles.base, { opacity: 1, backgroundColor: "blue" }];
+      return [
+        styles.base,
+        {
+          opacity: 1,
+          backgroundColor: "blue",
+          width: 150,
+          padding: 10,
+          borderRadius: 5,
+        },
+      ];
     }}
     onPress={onPress}
   >

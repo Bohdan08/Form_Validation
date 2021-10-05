@@ -63,25 +63,28 @@ export default function HomeScreen({ navigation }: any) {
       <StatusBar />
       <View style={styles.row}>
         <Text style={styles.title}>Welcome {user?.email}!</Text>
+      </View>
+
+      <View>
+        {/* <ScrollView style={styles.container}> */}
+        {usersData?.map((user: User, index: number) => (
+          <ListItem key={index} bottomDivider>
+            <ListItem.Content>
+              <ListItem.Title>{user.username}</ListItem.Title>
+              <ListItem.Subtitle>{user.email}</ListItem.Subtitle>
+            </ListItem.Content>
+          </ListItem>
+        ))}
+        {/* </ScrollView> */}
+      </View>
+      <View style={styles.row}>
         <IconButton
           name="logout"
           size={24}
           color="#fff"
+          text="Sign out"
           onPress={handleSignOut}
         />
-      </View>
-
-      <View>
-        <ScrollView style={styles.container}>
-          {usersData?.map((user: User, index: number) => (
-            <ListItem key={index} bottomDivider>
-              <ListItem.Content>
-                <ListItem.Title>{user.username}</ListItem.Title>
-                <ListItem.Subtitle>{user.email}</ListItem.Subtitle>
-              </ListItem.Content>
-            </ListItem>
-          ))}
-        </ScrollView>
       </View>
     </View>
   );
@@ -98,6 +101,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 24,
+    marginTop: 25,
   },
   title: {
     fontSize: 24,

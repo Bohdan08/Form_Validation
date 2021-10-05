@@ -40,16 +40,6 @@ export default function SignupScreen({ navigation }: any) {
   }) => {
     try {
       if (!isAnyFieldEmpty([email, password, username])) {
-        console.log(dbRef, "dbRef");
-        // authnenticate user and add him/her to db
-        // dbRef
-        //   .add({
-        //     username,
-        //     email,
-        //   })
-        //   .then(() => console.log("then"));
-        // await auth.createUserWithEmailAndPassword(email, password);
-
         await auth.createUserWithEmailAndPassword(email, password).then(() =>
           dbRef.add({
             username,
