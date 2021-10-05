@@ -1,14 +1,26 @@
 import { StatusBar } from "expo-status-bar";
-import { Formik } from "formik";
+import { Formik, Form, Field, FormikProps } from "formik";
 import React from "react";
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
+import * as Yup from "yup";
 
-import { Button, InputField, ErrorMessage } from "../components";
+import { ErrorMessage } from "../components";
 import Firebase from "../config/firebase";
 
-const isAnyFieldEmpty = (fields: string[]) =>
-  fields.filter((field) => field === "").length > 0;
+const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
+
+const CreateUserSchema = Yup.object().shape({
+  username: Yup.string()
+    .min(5, "Too Short!")
+    .max(50, "Too Long!")
+    .required("Username is Required"),
+  fullName: Yup.string()
+    .min(2, "Too Short!")
+    .max(50, "Too Long!")
+    .required("Full Name is required"),
+  phone: Yup.string().matches(phoneRegExp, "Phone number is not valid"),
+});
 
 export default function SignupScreen({ navigation }: any) {
   const [passwordVisibility, setPasswordVisibility] = useState(true);
@@ -18,17 +30,7 @@ export default function SignupScreen({ navigation }: any) {
   // get reference to our collection
   const dbRef = Firebase.firestore().collection("users");
 
-  const handlePasswordVisibility = () => {
-    if (rightIcon === "eye") {
-      setRightIcon("eye-off");
-      setPasswordVisibility(!passwordVisibility);
-    } else if (rightIcon === "eye-off") {
-      setRightIcon("eye");
-      setPasswordVisibility(!passwordVisibility);
-    }
-  };
-
-  const onHandleSignup = async ({
+  const onCreateUser = async ({
     fullName,
     phone,
     username,
@@ -66,81 +68,65 @@ export default function SignupScreen({ navigation }: any) {
       <StatusBar />
       <Text style={styles.title}>Create a unique user</Text>
       <Formik
-        onSubmit={onHandleSignup}
         initialValues={{ fullName: "", phone: "", username: "" }}
+        validationSchema={CreateUserSchema}
+        onSubmit={onCreateUser}
       >
-        {({ handleBlur, setFieldValue, handleSubmit, values }) => (
-          <View>
-            <InputField
-              inputStyle={{
-                fontSize: 14,
-              }}
-              containerStyle={{
-                backgroundColor: "#fff",
-                marginBottom: 20,
-              }}
-              leftIcon="human"
-              placeholder="Enter username"
-              autoCapitalize="none"
-              keyboardType="username"
-              textContentType="username"
-              autoFocus={true}
-              value={values.username}
-              onChangeText={(value: string) => setFieldValue("username", value)}
-              onBlur={handleBlur("username")}
-            />
-            <InputField
-              inputStyle={{
-                fontSize: 14,
-              }}
-              containerStyle={{
-                backgroundColor: "#fff",
-                marginBottom: 20,
-              }}
-              leftIcon="email"
-              placeholder="Enter Full Name"
-              autoCapitalize="none"
-              keyboardType="email-address"
-              textContentType="fullName"
-              autoFocus={true}
-              value={values.fullName}
-              onChangeText={(value: string) => setFieldValue("fullName", value)}
-            />
+        {(props: FormikProps<any>) => (
+          <Form>
+            <Field name="username" style={styles.formField}>
+              {({
+                field, // { name, value, onChange, onBlur }
+                form: { touched, errors }, // also values, setXXXX, handleXXXX, dirty, isValid, status, etc.
+                meta,
+              }: any) => (
+                <View>
+                  {meta.touched && meta.error && (
+                    <Text style={styles.textError}>{meta.error}</Text>
+                  )}
+                  <input type="text" placeholder="Username" {...field} />
+                </View>
+              )}
+            </Field>
 
-            <InputField
-              inputStyle={{
-                fontSize: 14,
-              }}
-              containerStyle={{
-                backgroundColor: "#fff",
-                marginBottom: 20,
-              }}
-              leftIcon="lock"
-              placeholder="Enter Phone Number"
-              autoCapitalize="none"
-              textContentType="phone"
-              value={values.phone}
-              onChangeText={(value: string) => setFieldValue("phone", value)}
-              handlePasswordVisibility={handlePasswordVisibility}
-            />
+            <Field name="fullName">
+              {({
+                field, // { name, value, onChange, onBlur }
+                form: { touched, errors }, // also values, setXXXX, handleXXXX, dirty, isValid, status, etc.
+                meta,
+              }: any) => (
+                <View style={styles.formField}>
+                  {meta.touched && meta.error && (
+                    <Text style={styles.textError}>{meta.error}</Text>
+                  )}
+                  <input type="text" placeholder="Full Name" {...field} />
+                </View>
+              )}
+            </Field>
+
+            <Field name="phone">
+              {({
+                field, // { name, value, onChange, onBlur }
+                form: { touched, errors }, // also values, setXXXX, handleXXXX, dirty, isValid, status, etc.
+                meta,
+              }: any) => (
+                <View style={styles.formField}>
+                  {meta.touched && meta.error && (
+                    <Text style={styles.textError}>{meta.error}</Text>
+                  )}
+                  <input type="tel" placeholder="Phone " {...field} />
+                </View>
+              )}
+            </Field>
+            <button type="submit">Submit</button>
+
             {userExists ? (
               <ErrorMessage
                 error={"User with this username already exists."}
                 visible={true}
               />
             ) : null}
-
-            <Button
-              onPress={handleSubmit}
-              backgroundColor="#f57c00"
-              title="Sign Up"
-              titleColor="#fff"
-              titleSize={20}
-              containerStyle={{
-                marginBottom: 24,
-              }}
-            />
-          </View>
+          </Form>
         )}
       </Formik>
     </View>
@@ -159,5 +145,15 @@ const styles = StyleSheet.create({
     color: "#000",
     alignSelf: "center",
     paddingBottom: 24,
+  },
+  formField: {
+    marginTop: 15,
+    marginBottom: 15,
+    paddingTop: 5,
+    paddingBottom: 5,
+    height: "30px",
+  },
+  textError: {
+    color: "red",
   },
 });

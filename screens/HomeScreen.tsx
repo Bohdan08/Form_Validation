@@ -10,7 +10,8 @@ import Firebase from "../config/firebase";
 type User = {
   key: number;
   username: string;
-  email: string;
+  fullName: string;
+  phone: string;
   res: any;
 };
 
@@ -29,13 +30,14 @@ export default function HomeScreen({ navigation, route }: any) {
     const userArr: User[] = [];
 
     querySnapshot.forEach((res: any) => {
-      const { username, email } = res.data();
+      const { username, fullName, phone } = res.data();
 
       userArr.push({
         key: res.id,
         res,
         username,
-        email,
+        fullName,
+        phone,
       });
     });
 
@@ -54,8 +56,15 @@ export default function HomeScreen({ navigation, route }: any) {
         {usersData?.map((user: User, index: number) => (
           <ListItem key={index} bottomDivider>
             <ListItem.Content>
-              <ListItem.Title>{user.username}</ListItem.Title>
-              <ListItem.Subtitle>{user.email}</ListItem.Subtitle>
+              <ListItem.Title style={styles.listTitle}>
+                Username: {user.username || "N/A"}
+              </ListItem.Title>
+              <ListItem.Subtitle style={styles.listTitle}>
+                Full Name: {user.fullName || "N/A"}
+              </ListItem.Subtitle>
+              <ListItem.Subtitle style={styles.listTitle}>
+                Phone: {user.phone || "N/A"}
+              </ListItem.Subtitle>
             </ListItem.Content>
           </ListItem>
         ))}
@@ -96,5 +105,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "normal",
     color: "#000",
+  },
+  listTitle: {
+    paddingTop: 5,
+    paddingBottom: 5,
   },
 });
