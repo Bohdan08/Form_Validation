@@ -1,12 +1,11 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useContext } from "react";
+import React from "react";
 import { useEffect } from "react";
 import { useState } from "react";
 import { StyleSheet, ScrollView, Text, View } from "react-native";
 import { ListItem } from "react-native-elements";
 import IconButton from "../components/IconButton";
 import Firebase from "../config/firebase";
-import { AuthenticatedUserContext } from "../navigation/AuthenticatedUserProvider";
 
 type User = {
   key: number;
@@ -15,26 +14,16 @@ type User = {
   res: any;
 };
 
-const auth = Firebase.auth();
-
-export default function HomeScreen() {
+export default function HomeScreen({ navigation, route }: any) {
+  const { username = "" } = route && route.params ? route.params : {};
+  // declare user collection
   const firestoreRef = Firebase.firestore().collection("users");
 
   const [usersData, setUsersData] = useState<User[]>([]);
 
-  const { user } = useContext(AuthenticatedUserContext);
-
   useEffect(() => {
     firestoreRef.onSnapshot(getCollection);
   }, []);
-
-  const handleSignOut = async () => {
-    try {
-      await auth.signOut();
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   const getCollection = (querySnapshot: any) => {
     const userArr: User[] = [];
@@ -57,7 +46,7 @@ export default function HomeScreen() {
     <View style={styles.container}>
       <StatusBar />
       <View style={styles.row}>
-        <Text style={styles.title}>Welcome {user?.email}!</Text>
+        <Text style={styles.title}>Welcome {username}</Text>
       </View>
 
       <View>
@@ -77,8 +66,8 @@ export default function HomeScreen() {
           name="logout"
           size={24}
           color="#fff"
-          text="Sign out"
-          onPress={handleSignOut}
+          text=""
+          onPress={() => navigation.navigate("Create user")}
         />
       </View>
     </View>

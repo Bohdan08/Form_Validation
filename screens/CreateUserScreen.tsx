@@ -2,12 +2,10 @@ import { StatusBar } from "expo-status-bar";
 import { Formik } from "formik";
 import React from "react";
 import { useState } from "react";
-import { StyleSheet, Text, View, Button as RNButton } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { Button, InputField, ErrorMessage } from "../components";
 import Firebase from "../config/firebase";
-
-const auth = Firebase.auth();
 
 const isAnyFieldEmpty = (fields: string[]) =>
   fields.filter((field) => field === "").length > 0;
@@ -15,8 +13,9 @@ const isAnyFieldEmpty = (fields: string[]) =>
 export default function SignupScreen({ navigation }: any) {
   const [passwordVisibility, setPasswordVisibility] = useState(true);
   const [rightIcon, setRightIcon] = useState("eye");
-  const [signupError, setSignupError] = useState("");
+  const [userExists, setUserExists] = useState(false);
 
+  // get reference to our collection
   const dbRef = Firebase.firestore().collection("users");
 
   const handlePasswordVisibility = () => {
@@ -30,37 +29,45 @@ export default function SignupScreen({ navigation }: any) {
   };
 
   const onHandleSignup = async ({
-    email,
-    password,
+    fullName,
+    phone,
     username,
   }: {
-    email: string;
-    password: string;
+    fullName: string;
+    phone: string;
     username: string;
   }) => {
     try {
-      if (!isAnyFieldEmpty([email, password, username])) {
-        await auth.createUserWithEmailAndPassword(email, password).then(() =>
-          dbRef.add({
-            username,
-            email,
-          })
-        );
-      } else {
-        setSignupError("All fields should be filled out.");
-      }
+      const usernameRef = dbRef.doc(username);
+
+      Firebase.firestore().runTransaction((tx) => {
+        return tx.get(usernameRef).then((userDoc) => {
+          // check if user exists
+          if (userDoc.exists) {
+            setUserExists(true);
+            return;
+          } else {
+            setUserExists(false);
+            dbRef
+              .doc(username)
+              .set({ phone, username, fullName })
+              .then(() => navigation.navigate("Home", { username }));
+          }
+        });
+      });
     } catch (error) {
-      setSignupError(error.message);
+      console.log(error);
+      // setSignupError(error.message);
     }
   };
 
   return (
     <View style={styles.container}>
       <StatusBar />
-      <Text style={styles.title}>Sign Up</Text>
+      <Text style={styles.title}>Create a unique user</Text>
       <Formik
         onSubmit={onHandleSignup}
-        initialValues={{ email: "", password: "", username: "" }}
+        initialValues={{ fullName: "", phone: "", username: "" }}
       >
         {({ handleBlur, setFieldValue, handleSubmit, values }) => (
           <View>
@@ -91,13 +98,13 @@ export default function SignupScreen({ navigation }: any) {
                 marginBottom: 20,
               }}
               leftIcon="email"
-              placeholder="Enter email"
+              placeholder="Enter Full Name"
               autoCapitalize="none"
               keyboardType="email-address"
-              textContentType="emailAddress"
+              textContentType="fullName"
               autoFocus={true}
-              value={values.email}
-              onChangeText={(value: string) => setFieldValue("email", value)}
+              value={values.fullName}
+              onChangeText={(value: string) => setFieldValue("fullName", value)}
             />
 
             <InputField
@@ -109,18 +116,18 @@ export default function SignupScreen({ navigation }: any) {
                 marginBottom: 20,
               }}
               leftIcon="lock"
-              placeholder="Enter password"
+              placeholder="Enter Phone Number"
               autoCapitalize="none"
-              autoCorrect={false}
-              secureTextEntry={passwordVisibility}
-              textContentType="password"
-              rightIcon={rightIcon}
-              value={values.password}
-              onChangeText={(value: string) => setFieldValue("password", value)}
+              textContentType="phone"
+              value={values.phone}
+              onChangeText={(value: string) => setFieldValue("phone", value)}
               handlePasswordVisibility={handlePasswordVisibility}
             />
-            {signupError ? (
-              <ErrorMessage error={signupError} visible={true} />
+            {userExists ? (
+              <ErrorMessage
+                error={"User with this username already exists."}
+                visible={true}
+              />
             ) : null}
 
             <Button
@@ -132,11 +139,6 @@ export default function SignupScreen({ navigation }: any) {
               containerStyle={{
                 marginBottom: 24,
               }}
-            />
-            <RNButton
-              onPress={() => navigation.navigate("Login")}
-              title="Sign In"
-              color="#e93b81"
             />
           </View>
         )}
