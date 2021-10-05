@@ -17,6 +17,8 @@ export default function SignupScreen({ navigation }: any) {
   const [rightIcon, setRightIcon] = useState("eye");
   const [signupError, setSignupError] = useState("");
 
+  const dbRef = Firebase.firestore().collection("users");
+
   const handlePasswordVisibility = () => {
     if (rightIcon === "eye") {
       setRightIcon("eye-off");
@@ -38,7 +40,22 @@ export default function SignupScreen({ navigation }: any) {
   }) => {
     try {
       if (!isAnyFieldEmpty([email, password, username])) {
-        await auth.createUserWithEmailAndPassword(email, password);
+        console.log(dbRef, "dbRef");
+        // authnenticate user and add him/her to db
+        // dbRef
+        //   .add({
+        //     username,
+        //     email,
+        //   })
+        //   .then(() => console.log("then"));
+        // await auth.createUserWithEmailAndPassword(email, password);
+
+        await auth.createUserWithEmailAndPassword(email, password).then(() =>
+          dbRef.add({
+            username,
+            email,
+          })
+        );
       } else {
         setSignupError("All fields should be filled out.");
       }

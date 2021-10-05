@@ -31,11 +31,9 @@ export default function LoginScreen({ navigation }: any) {
   const handleSubmit = async ({
     email,
     password,
-    username,
   }: {
     email: string;
     password: string;
-    username: string;
   }) => {
     try {
       if (isAnyFieldEmpty([email, password])) {
@@ -55,30 +53,10 @@ export default function LoginScreen({ navigation }: any) {
 
       <Formik
         onSubmit={handleSubmit}
-        initialValues={{ email: "", password: "", username: "" }}
+        initialValues={{ email: "", password: "" }}
       >
         {({ handleBlur, setFieldValue, handleSubmit, values }) => (
           <View>
-            <InputField
-              inputStyle={{
-                fontSize: "14",
-              }}
-              containerStyle={{
-                backgroundColor: "#fff",
-                marginBottom: "20",
-              }}
-              leftIcon="user"
-              placeholder="Enter username"
-              autoCapitalize="none"
-              keyboardType="username"
-              textContentType="username"
-              autoFocus={true}
-              value={values.username}
-              onChangeText={(value: string) => {
-                setFieldValue("username", value);
-              }}
-              onBlur={handleBlur("username")}
-            />
             <InputField
               inputStyle={{
                 fontSize: 14,
