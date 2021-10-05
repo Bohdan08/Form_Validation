@@ -2,13 +2,7 @@ import { StatusBar } from "expo-status-bar";
 import React, { useContext } from "react";
 import { useEffect } from "react";
 import { useState } from "react";
-import {
-  StyleSheet,
-  ScrollView,
-  ActivityIndicator,
-  Text,
-  View,
-} from "react-native";
+import { StyleSheet, ScrollView, Text, View } from "react-native";
 import { ListItem } from "react-native-elements";
 import IconButton from "../components/IconButton";
 import Firebase from "../config/firebase";
@@ -23,7 +17,7 @@ type User = {
 
 const auth = Firebase.auth();
 
-export default function HomeScreen({ navigation }: any) {
+export default function HomeScreen() {
   const firestoreRef = Firebase.firestore().collection("users");
 
   const [usersData, setUsersData] = useState<User[]>([]);
@@ -47,6 +41,7 @@ export default function HomeScreen({ navigation }: any) {
 
     querySnapshot.forEach((res: any) => {
       const { username, email } = res.data();
+
       userArr.push({
         key: res.id,
         res,

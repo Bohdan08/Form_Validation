@@ -8,15 +8,9 @@ type InputField = {
   rightIcon: any;
   inputStyle: { [key: string]: string };
   containerStyle: { [key: string]: string };
-
   iconColor: string | undefined;
   placeholderTextColor: string | undefined;
-  // placeholder?: string;
-  // autoCapitalize?: string;
-  // keyboardType?: string;
-  // textContentType?: string;
   autoFocus?: boolean;
-  // value?: string;
   handlePasswordVisibility: () => any;
 };
 

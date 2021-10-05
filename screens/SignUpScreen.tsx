@@ -72,7 +72,7 @@ export default function SignupScreen({ navigation }: any) {
                 backgroundColor: "#fff",
                 marginBottom: 20,
               }}
-              leftIcon="user"
+              leftIcon="human"
               placeholder="Enter username"
               autoCapitalize="none"
               keyboardType="username"

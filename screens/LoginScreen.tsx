@@ -12,8 +12,6 @@ const isAnyFieldEmpty = (fields: string[]) =>
   !fields.filter((field) => field === "").length;
 
 export default function LoginScreen({ navigation }: any) {
-  //   const [email, setEmail] = useState("");
-  //   const [password, setPassword] = useState("");
   const [passwordVisibility, setPasswordVisibility] = useState(true);
   const [rightIcon, setRightIcon] = useState("eye");
   const [loginError, setLoginError] = useState("");
